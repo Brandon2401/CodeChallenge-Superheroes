@@ -55,3 +55,26 @@ def update_power(id):
         return jsonify(power.to_dict()), 200
     except Exception as e:
         return jsonify({"errors": [str(e)]}), 400
+
+@api.route("/hero_powers", methods=["POST"])
+def create_hero_power():
+    try:
+        data = request.get_json()
+        hero_power = HeroPower(
+            strength=data["strength"],
+            hero_id=data["hero_id"],
+            power_id=data["power_id"]
+        )
+        db.session.add(hero_power)
+        db.session.commit()
+
+        return jsonify({
+            "id": hero_power.id,
+            "hero_id": hero_power.hero_id,
+            "power_id": hero_power.power_id,
+            "strength": hero_power.strength,
+            "hero": hero_power.hero.to_dict(),
+            "power": hero_power.power.to_dict()
+        }), 201
+    except Exception as e:
+        return jsonify({"errors": [str(e)]}), 400
