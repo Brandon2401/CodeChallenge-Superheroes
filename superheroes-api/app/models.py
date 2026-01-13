@@ -22,3 +22,15 @@ class Hero(db.Model):
             "name": self.name,
             "super_name": self.super_name
         }
+    @validates("description")
+    def validate_description(self, key, description):
+        if not description or len(description) < 20:
+            raise ValueError("Description must be at least 20 characters")
+        return description
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "description": self.description
+        }
