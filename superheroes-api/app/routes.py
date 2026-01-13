@@ -42,3 +42,16 @@ def get_power(id):
         return jsonify({"error": "Power not found"}), 404
     return jsonify(power.to_dict()), 200
 
+@api.route("/powers/<int:id>", methods=["PATCH"])
+def update_power(id):
+    power = Power.query.get(id)
+    if not power:
+        return jsonify({"error": "Power not found"}), 404
+
+    try:
+        data = request.get_json()
+        power.description = data["description"]
+        db.session.commit()
+        return jsonify(power.to_dict()), 200
+    except Exception as e:
+        return jsonify({"errors": [str(e)]}), 400
