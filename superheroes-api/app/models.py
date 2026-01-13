@@ -34,3 +34,20 @@ class Hero(db.Model):
             "name": self.name,
             "description": self.description
         }
+    class HeroPower(db.Model):
+     __tablename__ = "hero_powers"
+
+    id = db.Column(db.Integer, primary_key=True)
+    strength = db.Column(db.String)
+
+    hero_id = db.Column(db.Integer, db.ForeignKey("heroes.id"))
+    power_id = db.Column(db.Integer, db.ForeignKey("powers.id"))
+
+    hero = db.relationship("Hero", back_populates="hero_powers")
+    power = db.relationship("Power", back_populates="hero_powers")
+
+    @validates("strength")
+    def validate_strength(self, key, strength):
+        if strength not in ["Strong", "Weak", "Average"]:
+            raise ValueError("Strength must be Strong, Weak, or Average")
+        return strength
