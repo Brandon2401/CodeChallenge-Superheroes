@@ -3,12 +3,13 @@ from sqlalchemy.orm import validates
 
 db = SQLAlchemy()
 
+
 class Hero(db.Model):
     __tablename__ = "heroes"
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String)
-    super_name = db.Column(db.String)
+    name = db.Column(db.String, nullable=False)
+    super_name = db.Column(db.String, nullable=False)
 
     hero_powers = db.relationship(
         "HeroPower",
@@ -22,6 +23,21 @@ class Hero(db.Model):
             "name": self.name,
             "super_name": self.super_name
         }
+
+
+class Power(db.Model):
+    __tablename__ = "powers"
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, nullable=False)
+    description = db.Column(db.String, nullable=False)
+
+    hero_powers = db.relationship(
+        "HeroPower",
+        back_populates="power",
+        cascade="all, delete-orphan"
+    )
+
     @validates("description")
     def validate_description(self, key, description):
         if not description or len(description) < 20:
@@ -34,14 +50,16 @@ class Hero(db.Model):
             "name": self.name,
             "description": self.description
         }
-    class HeroPower(db.Model):
-     __tablename__ = "hero_powers"
+
+
+class HeroPower(db.Model):
+    __tablename__ = "hero_powers"
 
     id = db.Column(db.Integer, primary_key=True)
-    strength = db.Column(db.String)
+    strength = db.Column(db.String, nullable=False)
 
-    hero_id = db.Column(db.Integer, db.ForeignKey("heroes.id"))
-    power_id = db.Column(db.Integer, db.ForeignKey("powers.id"))
+    hero_id = db.Column(db.Integer, db.ForeignKey("heroes.id"), nullable=False)
+    power_id = db.Column(db.Integer, db.ForeignKey("powers.id"), nullable=False)
 
     hero = db.relationship("Hero", back_populates="hero_powers")
     power = db.relationship("Power", back_populates="hero_powers")
